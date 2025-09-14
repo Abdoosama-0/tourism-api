@@ -25,7 +25,7 @@ const logged =(req, res, next)=> {
     const token = req.cookies.jwt;
 
     if (!token) {
-      next();
+      return next();
     }
     return res.status(401).json({ message: "you are already logged in" });
 
