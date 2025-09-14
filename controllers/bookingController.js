@@ -3,15 +3,29 @@ const Hotel = require("../models/Hotel");
 const Activity = require("../models/Activity");
 const Event = require("../models/Event");
 
-
+//owner bookings or all bookings for admin
 const getBookings = async (req, res) => {
   try {
-    let bookings;
-    if (req.user.role === "admin") {
-      bookings = await Booking.find().populate("user").populate("item");
-    } else {
-      bookings = await Booking.find({ user: req.user._id }).populate("item");
+   
+    let filter = {};
+
+    if (req.user.role !== "admin") {
+      filter.user = req.user.id;
     }
+
+  
+    if (req.query.type) {
+      filter.type = req.query.type; 
+    }
+
+
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+    const bookings = await Booking.find(filter)
+      .populate("user","email name _id")
+      .populate("item");
+
     res.json(bookings);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -19,16 +33,17 @@ const getBookings = async (req, res) => {
 };
 
 
+//owner or admin
 const getBookingById = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
-      .populate("user")
+      .populate("user", "email _id name")
       .populate("item");
 
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
    
-    if (req.user.role !== "admin" && booking.user._id.toString() !== req.user._id.toString()) {
+    if (req.user.role !== "admin" && booking.user._id.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -45,26 +60,26 @@ const createBooking = async (req, res) => {
 
 
     let existingItem;
-    if (type === "hotel") existingItem = await Hotel.findById(item);
-    else if (type === "activity") existingItem = await Activity.findById(item);
-    else if (type === "event") existingItem = await Event.findById(item);
+    if (type === "Hotel") existingItem = await Hotel.findById(item);
+    else if (type === "Activity") existingItem = await Activity.findById(item);
+    else if (type === "Event") existingItem = await Event.findById(item);
     else return res.status(400).json({ message: "Invalid booking type" });
 
     if (!existingItem) return res.status(404).json({ message: `${type} not found` });
 
     const booking = await Booking.create({
-      user: req.user._id,
+      user: req.user.id,
       type,
       item,
     });
 
-    res.status(201).json(booking);
+    res.json(booking);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-
+//adminOnly
 const updateBookingStatus = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
@@ -84,17 +99,17 @@ const updateBookingStatus = async (req, res) => {
   }
 };
 
-
+//owner or admin
 const deleteBooking = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    if (req.user.role !== "admin" && booking.user._id.toString() !== req.user._id.toString()) {
+    if (req.user.role !== "admin" && booking.user._id.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    await booking.remove();
+    await Booking.deleteOne({ _id: booking._id });
     res.json({ message: "Booking deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });

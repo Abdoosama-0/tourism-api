@@ -19,8 +19,6 @@ router.get("/:id", getHotelById);
 router.post("/", protect, adminOnly, createHotel);
 router.put("/:id", protect, adminOnly, updateHotel);
 router.delete("/:id", protect, adminOnly, deleteHotel);
-
-
 router.post("/batchCreateHotels", protect, adminOnly, batchCreateHotels);
 
 module.exports = router;

@@ -1,27 +1,6 @@
 const Activity = require("../models/Activity");
 
 
-const batchCreateActivities = async (req, res) => {
-  try {
-    const { activities } = req.body; 
-
-    if (!activities || !Array.isArray(activities) || activities.length === 0) {
-      return res.status(400).json({ message: "No activities provided" });
-    }
-
-
-    const createdActivities = await Activity.insertMany(activities);
-
-    res.status(201).json({
-      message: `${createdActivities.length} activities created successfully`,
-      activities: createdActivities,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-};
-
 
 const getActivities = async (req, res) => {
   try {
@@ -43,7 +22,29 @@ const getActivityById = async (req, res) => {
   }
 };
 
+//adminOnly
+const batchCreateActivities = async (req, res) => {
+  try {
+    const { activities } = req.body; 
 
+    if (!activities || !Array.isArray(activities) || activities.length === 0) {
+      return res.status(400).json({ message: "No activities provided" });
+    }
+
+
+    const createdActivities = await Activity.insertMany(activities);
+
+    res.status(201).json({
+      message: `${createdActivities.length} activities created successfully`,
+      activities: createdActivities,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+//adminOnly
 const createActivity = async (req, res) => {
   try {
     const { title, description, location, date, price } = req.body;
@@ -55,7 +56,7 @@ const createActivity = async (req, res) => {
   }
 };
 
-
+//adminOnly
 const updateActivity = async (req, res) => {
   try {
     const activity = await Activity.findById(req.params.id);
@@ -76,13 +77,13 @@ const updateActivity = async (req, res) => {
   }
 };
 
-
+//adminOnly
 const deleteActivity = async (req, res) => {
   try {
     const activity = await Activity.findById(req.params.id);
     if (!activity) return res.status(404).json({ message: "Activity not found" });
 
-    await activity.remove();
+    await Activity.deleteOne({ _id: activity._id });
     res.json({ message: "Activity deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });

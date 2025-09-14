@@ -6,6 +6,7 @@ const eventSchema = new mongoose.Schema(
     speakers: [{ type: String }], 
     date: { type: Date, required: true },
     location: { type: String, required: true },
+    eventPrice: { type: Number, required: true } 
   },
   { timestamps: true }
 );

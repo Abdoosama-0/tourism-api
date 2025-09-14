@@ -4,6 +4,7 @@ const User =require('../models/User')
 const nodemailer = require("nodemailer") ;
 const bcrypt = require("bcrypt") ;
 const { isValidEmail, isStrongPassword } = require("../utils/validators");
+
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: "7d", 

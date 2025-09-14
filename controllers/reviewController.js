@@ -9,9 +9,25 @@ const getReviews = async (req, res) => {
     const { type, itemId } = req.params;
 
     const reviews = await Review.find({ type, item: itemId })
-      .populate("user", "name email");
+      .populate("user", "name email _id");
 
     res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getReview= async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id)
+      .populate("user","_id email name") 
+      .populate("item"); 
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    res.json(review);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -31,9 +47,9 @@ const createReview = async (req, res) => {
 
     if (!existingItem) return res.status(404).json({ message: `${type} not found` });
 
-  
+
     const review = await Review.create({
-      user: req.user._id,
+      user: req.user.id,
       type,
       item,
       rating,
@@ -46,13 +62,14 @@ const createReview = async (req, res) => {
   }
 };
 
+//owner only
 const updateReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    if (req.user.role !== "admin" && review.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Access denied" });
+    if ( review.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Access denied, you must be the owner of this comment" });
     }
 
     const { rating, comment } = req.body;
@@ -66,17 +83,17 @@ const updateReview = async (req, res) => {
   }
 };
 
-
+//owner only
 const deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    if (req.user.role !== "admin" && review.user.toString() !== req.user._id.toString()) {
+    if (review.user.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    await review.remove();
+    await Review.deleteOne({ _id: review._id });
     res.json({ message: "Review deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -88,4 +105,5 @@ module.exports = {
   createReview,
   updateReview,
   deleteReview,
+  getReview
 };
