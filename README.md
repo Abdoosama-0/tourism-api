@@ -25,11 +25,11 @@ This API allows users to create, view, update, and delete bookings for **hotels*
 ---
 ## 🌐 Live API Test
 You can try the API in real-time:  
-👉 [Click here to test]()
+👉 [Click here to test](https://tourism-api-production-aac8.up.railway.app)
 
 ## 📬 Postman Collection & API Documentation
 Explore and test all API endpoints using the Postman Collection below:  
-👉 [Postman Collection](https://goatme.postman.co/workspace/SocialNet-API~f41737ee-6515-4f7d-8266-fe9389bba116/collection/40780206-70ea1d27-d4a5-4e6e-bb2b-7c153d490985?action=share&source=copy-link&creator=40780206)  
+👉 [Postman Collection](https://www.postman.com/goatme/workspace/my-projects/collection/40780206-70ea1d27-d4a5-4e6e-bb2b-7c153d490985?action=share&source=copy-link&creator=40780206)  
 
 **Note:** Make sure to use the link above as the **URL variable** in Postman to test all endpoints correctly.
 
