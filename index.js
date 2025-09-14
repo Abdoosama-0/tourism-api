@@ -52,7 +52,7 @@ app.get('/error', (req, res,next) => {
 }
 });
 //================================ error handler middleware=============================
-require('./Middleware/errorMiddleware')(app)
+require('./middleware/errorMiddleware')(app)
 // ==================== Start Server ====================
 const PORT = process.env.Server_PORT || 5000;
 app.listen(PORT, () => {
